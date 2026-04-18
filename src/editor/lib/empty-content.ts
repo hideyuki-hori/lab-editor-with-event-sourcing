@@ -1,4 +1,4 @@
-import type { JSONContent } from '@tiptap/react'
+import type { JSONContent } from '@tiptap/core'
 
 export const EMPTY_CONTENT: JSONContent = {
   type: 'doc',

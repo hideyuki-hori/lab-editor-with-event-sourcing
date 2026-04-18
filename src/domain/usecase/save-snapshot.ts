@@ -1,4 +1,4 @@
-import type { JSONContent } from '@tiptap/react'
+import type { JSONContent } from '@tiptap/core'
 import { Context, type Effect } from 'effect'
 import type { RepositoryError } from '~/domain/errors'
 
