@@ -4,6 +4,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use tauri::{AppHandle, Emitter};
 
 #[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub(super) struct StepsAppliedPayload {
     pub stream_id: String,
     pub branch_id: String,

@@ -1,8 +1,8 @@
 import { Chunk, Duration, Effect, Fiber, Schedule, Stream } from 'effect'
 import { useCallback, useEffect, useRef } from 'react'
-import type { EventInput } from '~/editor/schema/event-input'
-import { runFork } from '~/lib/runtime'
-import { AppendEvents } from '~/repositories/append-events/tag'
+import type { EventInput } from '~/domain/schema/event-input'
+import { AppendEvents } from '~/domain/usecase'
+import { useRunFork } from '~/react-effect'
 
 const MAX_BATCH = 1000
 
@@ -32,6 +32,7 @@ export function useStepPipeline(params: Params) {
   paramsRef.current = params
 
   const emitRef = useRef<((emitted: Emitted) => void) | null>(null)
+  const runFork = useRunFork()
 
   useEffect(() => {
     const stream = Stream.async<Emitted>((emit) => {
@@ -82,7 +83,7 @@ export function useStepPipeline(params: Params) {
     return () => {
       runFork(Fiber.interrupt(fiber))
     }
-  }, [])
+  }, [runFork])
 
   const emit = useCallback((emitted: Emitted) => {
     emitRef.current?.(emitted)

@@ -1,4 +1,4 @@
-import type { Branch } from '~/editor/schema/branch'
+import type { Branch } from '~/domain/schema/branch'
 import type { BranchNode } from '~/editor/types/branch-node'
 
 export const buildBranchTree = (branches: readonly Branch[]): BranchNode[] => {
@@ -10,8 +10,8 @@ export const buildBranchTree = (branches: readonly Branch[]): BranchNode[] => {
   for (const b of branches) {
     const node = map.get(b.id)
     if (!node) continue
-    if (b.parent_branch_id) {
-      const parent = map.get(b.parent_branch_id)
+    if (b.parentBranchId) {
+      const parent = map.get(b.parentBranchId)
       if (parent) {
         parent.children.push(node)
       } else {
@@ -22,7 +22,7 @@ export const buildBranchTree = (branches: readonly Branch[]): BranchNode[] => {
     }
   }
   const sort = (nodes: BranchNode[]) => {
-    nodes.sort((a, b) => a.branch.created_at - b.branch.created_at)
+    nodes.sort((a, b) => a.branch.createdAt - b.branch.createdAt)
     for (const n of nodes) sort(n.children)
   }
   sort(roots)

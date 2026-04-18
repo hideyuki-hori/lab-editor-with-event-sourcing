@@ -2,6 +2,16 @@ import { EditorContent, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { Effect } from 'effect'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import type { Branch } from '~/domain/schema/branch'
+import type { EventInput } from '~/domain/schema/event-input'
+import type { LoadedPage } from '~/domain/schema/loaded-page'
+import {
+  CreateBranch,
+  ListBranches,
+  LoadPage,
+  RestoreToVersion,
+  SwitchBranch,
+} from '~/domain/usecase'
 import { BranchTree } from '~/editor/branch-tree'
 import { type EditorStatus, EditorToolbar } from '~/editor/editor-toolbar'
 import { HistorySlider } from '~/editor/history-slider'
@@ -12,15 +22,7 @@ import { applyRestoredDoc } from '~/editor/lib/apply-restored-doc'
 import { EMPTY_CONTENT } from '~/editor/lib/empty-content'
 import { previewTitle } from '~/editor/lib/preview-title'
 import { tailVersionOf } from '~/editor/lib/tail-version'
-import type { Branch } from '~/editor/schema/branch'
-import type { EventInput } from '~/editor/schema/event-input'
-import type { LoadedPage } from '~/editor/schema/loaded-page'
-import { runPromise } from '~/lib/runtime'
-import { CreateBranch } from '~/repositories/create-branch/tag'
-import { ListBranches } from '~/repositories/list-branches/tag'
-import { LoadPage } from '~/repositories/load-page/tag'
-import { RestoreToVersion } from '~/repositories/restore-to-version/tag'
-import { SwitchBranch } from '~/repositories/switch-branch/tag'
+import { useRunPromise } from '~/react-effect'
 
 const FLUSH_DEBOUNCE_MS = 400
 
@@ -45,6 +47,7 @@ export function Editor({ selectedId }: Props) {
   const forkingRef = useRef(false)
   const editorRef = useRef<ReturnType<typeof useEditor>>(null)
   const jumpHistory = useJumpHistory()
+  const runPromise = useRunPromise()
 
   const lastSnapshotVersionRef = useSnapshotScheduler({
     getBranchId: () => currentBranchIdRef.current,
@@ -56,14 +59,17 @@ export function Editor({ selectedId }: Props) {
     setPreviewVersion(version)
   }, [])
 
-  const refreshBranches = useCallback((streamId: string) => {
-    const program = Effect.gen(function* () {
-      const listBranches = yield* ListBranches
-      const result = yield* listBranches(streamId)
-      setBranches(result)
-    })
-    runPromise(program).catch(console.error)
-  }, [])
+  const refreshBranches = useCallback(
+    (streamId: string) => {
+      const program = Effect.gen(function* () {
+        const listBranches = yield* ListBranches
+        const result = yield* listBranches(streamId)
+        setBranches(result)
+      })
+      runPromise(program).catch(console.error)
+    },
+    [runPromise],
+  )
 
   const emitSteps = useStepPipeline({
     debounceMs: FLUSH_DEBOUNCE_MS,
@@ -207,6 +213,7 @@ export function Editor({ selectedId }: Props) {
     updatePreview,
     refreshBranches,
     lastSnapshotVersionRef,
+    runPromise,
   ])
 
   const applyJump = async (version: number) => {

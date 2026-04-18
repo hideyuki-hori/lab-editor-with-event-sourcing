@@ -1,4 +1,4 @@
-import type { Page } from '~/app/schema/page'
+import type { Page } from '~/domain/schema/page'
 
 type Props = {
   pages: readonly Page[]

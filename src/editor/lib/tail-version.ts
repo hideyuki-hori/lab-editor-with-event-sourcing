@@ -1,4 +1,4 @@
-import type { LoadedPage } from '~/editor/schema/loaded-page'
+import type { LoadedPage } from '~/domain/schema/loaded-page'
 
 export const tailVersionOf = (loaded: LoadedPage) =>
   loaded.events.length > 0

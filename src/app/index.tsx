@@ -1,16 +1,16 @@
 import { Effect } from 'effect'
 import { useCallback, useEffect, useState } from 'react'
 import { PageList } from '~/app/page-list'
-import type { Page } from '~/app/schema/page'
+import type { Page } from '~/domain/schema/page'
+import { CreatePage, ListPages } from '~/domain/usecase'
 import { Editor } from '~/editor'
-import { useTauriEvent } from '~/hooks/use-tauri-event'
-import { runPromise } from '~/lib/runtime'
-import { CreatePage } from '~/repositories/create-page/tag'
-import { ListPages } from '~/repositories/list-pages/tag'
+import { usePagesChanged } from '~/hooks/use-pages-changed'
+import { useRunPromise } from '~/react-effect'
 
 export function App() {
   const [pages, setPages] = useState<readonly Page[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const runPromise = useRunPromise()
 
   const refresh = useCallback(() => {
     const program = Effect.gen(function* () {
@@ -19,13 +19,13 @@ export function App() {
       setPages(result)
     })
     return runPromise(program).catch(console.error)
-  }, [])
+  }, [runPromise])
 
   useEffect(() => {
     refresh()
   }, [refresh])
 
-  useTauriEvent<null>('pages_changed', refresh)
+  usePagesChanged(refresh)
 
   const handleCreate = () => {
     const program = Effect.gen(function* () {

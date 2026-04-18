@@ -1,5 +1,5 @@
+import type { Branch } from '~/domain/schema/branch'
 import { buildBranchTree } from '~/editor/lib/build-branch-tree'
-import type { Branch } from '~/editor/schema/branch'
 import type { BranchNode } from '~/editor/types/branch-node'
 
 type Props = {
@@ -22,7 +22,7 @@ type ItemProps = {
 function BranchItem({ node, depth, isLast, ancestors, currentBranchId, onSelect }: ItemProps) {
   const active = node.branch.id === currentBranchId
   const label = node.branch.name ?? node.branch.id.slice(0, 8)
-  const forkInfo = node.branch.parent_branch_id !== null ? ` (v${node.branch.fork_version})` : ''
+  const forkInfo = node.branch.parentBranchId !== null ? ` (v${node.branch.forkVersion})` : ''
   const guides = ancestors.map((a) => (
     <span key={a.branchId} className='inline-block w-4 text-gray-300'>
       {a.hasMore ? '│' : ' '}
